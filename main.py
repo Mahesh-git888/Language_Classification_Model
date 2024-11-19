@@ -190,7 +190,55 @@ def training_phase():
 
         # Train Model
         model = RandomForestClassifier(n_estimators=100, random_state=42)
-        model.fit(X_train, y_train)
+        model.fit(X_train, y_train) 
+
+
+
+        ## For testing with unseen data 
+
+
+        test_dataset_path = 'test_dataset.csv'
+        test_data = pd.read_csv(test_dataset_path)
+
+        # Ensure 'text' and 'language' columns exist in test dataset
+        if 'text' not in test_data.columns or 'language' not in test_data.columns:
+            raise KeyError("Test dataset must contain 'text' and 'language' columns.")
+
+        # Handle missing or non-string values in the 'text' column
+        test_data['text'] = test_data['text'].astype(str).fillna('')
+
+        # Extract features for the test dataset
+        features_test_df = pd.DataFrame(test_data.apply(extract_features, axis=1).tolist())
+
+
+        with open("encoder.pkl", "rb") as encoder_file:
+            encoder = pickle.load(encoder_file)
+
+        # One-Hot Encode the 'script' feature in the test dataset
+        script_encoded_test = encoder.transform(features_test_df[['script']].values.reshape(-1, 1))  # Use the fitted encoder
+        script_df_test = pd.DataFrame(script_encoded_test, columns=encoder.categories_[0])
+
+        # Add the encoded 'script' features to the test feature dataframe
+        features_test_df = pd.concat([features_test_df, script_df_test], axis=1)
+
+        # Prepare data for prediction (drop 'script' column as it is now encoded)
+        X_test_final = features_test_df.drop('script', axis=1)
+        y_test_final = test_data['language']  # Target variable
+
+        # Predict using the trained model
+        y_pred_test = model.predict(X_test_final)
+
+
+
+        from sklearn.metrics import classification_report
+        print("Classification Report on Final Test Data:")
+        print(classification_report(y_test_final, y_pred_test))
+
+        # Optionally, show confusion matrix
+        from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+        cm_test = confusion_matrix(y_test_final, y_pred_test, labels=model.classes_)
+        ConfusionMatrixDisplay(confusion_matrix=cm_test, display_labels=model.classes_).plot(cmap='Blues')
+        plt.show()
 
         with open("mahesh_forest.pkl", "wb") as f:
 
