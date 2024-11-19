@@ -59,7 +59,7 @@ Install the required libraries:
 pip install -r requirements.txt
 ```
 
-### 3. Training the Model (Optional)
+### 3. Training the Model 
 If you want to retrain the model:
 1. Place your dataset in the same folder and name it `training_dataset.csv`.
 2. Run the script:
@@ -71,7 +71,20 @@ If you want to retrain the model:
    - Save the trained model as `mahesh_forest.pkl` and the encoder as `encoder.pkl`.
    - Display evaluation metrics and a confusion matrix.
 
-### 4. Predict Language
+### 4. Testing the Model
+If you want to retrain the model:
+1. Place your dataset in the same folder and name it `test_dataset.csv`.
+2. Run the script:
+   ```bash
+   python main.py
+   ```
+3. The script will:
+   - Train the model on the dataset.
+   - Save the trained model as `mahesh_forest.pkl` and the encoder as `encoder.pkl`.
+   - Display evaluation metrics and a confusion matrix.
+
+
+### 5. Predict Language
 To predict the language of a text:
 1. Ensure `mahesh_forest.pkl` and `encoder.pkl` are in the same folder as the script.
 2. Run the script:
